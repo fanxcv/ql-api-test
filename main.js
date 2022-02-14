@@ -57,20 +57,24 @@ function findValue() {
 
       // 发送给青
       let success = true
-      const token = await getToken()
-      if (!token) {
-        showNotice('登录失败, 获取服务器信息错误, 软件即将关闭')
-          .then(() => app.exit())
-      }
-      const ckList = await getCkList(token) || []
-      const pin = values['pt_pin']
-      const cks = ckList.filter(it => it.value.indexOf(`pt_pin=${pin}`))
-      if (cks && cks.length > 0) {
-        for (let ck of cks) {
-          success = success && await updateCk(token, ck, v)
+      try {
+        const token = await getToken()
+        if (!token) {
+          showNotice('登录失败, 获取服务器信息错误, 软件即将关闭')
+            .then(() => app.exit())
         }
-      } else {
-        success = await addCk(token, v, pin)
+        const ckList = await getCkList(token) || []
+        const pin = values['pt_pin']
+        const cks = ckList.filter(it => it.value.indexOf(`pt_pin=${pin};`) >= 0)
+        if (cks && cks.length > 0) {
+          for (let ck of cks) {
+            success = success && await updateCk(token, ck, v)
+          }
+        } else {
+          success = await addCk(token, v, pin)
+        }
+      } catch (e) {
+        success = false
       }
 
       showNotice(success ? '登录成功了, 即将返回登录界面, 你就可以登录其他的账号了' : '登录失败了, 要不再试一次吧')
@@ -126,9 +130,9 @@ async function updateCk(token, ck, value) {
 }
 
 async function addCk(token, value, pin) {
-  const {data: {code}} = await axios.post(`${config.Host}/open/envs?t=${new Date().getTime()}`, {
+  const {data: {code}} = await axios.post(`${config.Host}/open/envs?t=${new Date().getTime()}`, [{
     name: 'JD_COOKIE', remarks: pin, value
-  }, {
+  }], {
     headers: {Authorization: `Bearer ${token}`}
   })
   return code && code === 200
