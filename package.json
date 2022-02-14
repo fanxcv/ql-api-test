@@ -1,0 +1,34 @@
+{
+  "name": "jd-login",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder -mw"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^0.25.0",
+    "electron": "^16.0.8",
+    "electron-builder": "~22.10.5",
+    "electron-reloader": "^1.2.2",
+    "electron-store": "^8.0.1"
+  },
+  "build": {
+    "appId": "local.egg.jd",
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    }
+  }
+}
